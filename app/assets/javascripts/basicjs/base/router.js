@@ -247,7 +247,7 @@ var Router=Class.extend({
 			return pathname.match(router.route) !== null
 		});
 		var parameters;
-		$.get(pathname,function(data){
+		$.get(url,function(data){
 			var $view = $(data).find(".view");
 			$("#history-level li.current .view").html($view.html());
 
