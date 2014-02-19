@@ -39,7 +39,7 @@ Helper={
 		if(object.attributes){
 			object = object.attributes;
 		}
-		_(object).pairs().forEach(function(pair){
+		_.each(_.pairs(object),function(pair){
 			var attr= pair[0];
 			var value= pair[1];
 			if(value==null){
