@@ -103,8 +103,5 @@ Helper={
 	guid: function() {
 	  return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
 	         this.s4() + '-' + this.s4() + this.s4() + this.s4();
-	},
-
-	
-
+	}
 }
