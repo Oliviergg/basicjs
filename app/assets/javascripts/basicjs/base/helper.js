@@ -1,33 +1,63 @@
 Helper={
+	getHtmlElementValue:function(elem){
+    var $elem = elem;
+    if(!elem.jquery){
+			$elem = $(elem);
+		}
+    var value = undefined;
+    if($elem.is("input[type=checkbox]")){
+			value = $elem.is(":checked");
+    }else if($elem.data("select2")){
+    	value = $elem.select2("val");
+    }else if($elem.is("select")){
+      value = $elem.val();
+    }else if( $elem.is("input") || $elem.is("textarea") ){
+      value = $elem.val();
+		}else{
+      value = $elem.html(); 
+    }
+    value = Helper.trim(value);
+    if(value == "true"){
+    	value = true;
+    }else if(value == "false"){
+    	value = false;
+    }else if(/^\[.*\]$/.test(value)){
+    	value = JSON.parse(value);
+    }
+    return value
+	},
+
+	mergeAttributeValue:function(data,elem){
+    var $elem = elem;
+    if(!elem.jquery){
+			$elem = $(elem);
+		}
+		data[$elem.attr("data-attribute-name")] = this.getHtmlElementValue($elem);
+	},
+
+	dataModelToObject: function(modelName,html){
+		var self=this;
+		var $html=html;
+		if(!html.jquery){
+			$html = $(html);
+		}
+		var data={};
+		$html.find("[data-model-name="+modelName+"]").each(function(i,elem){
+			self.mergeAttributeValue(data,elem);
+    });
+		return data;
+
+	},
+
 	dataAttributeToObject: function(html){
+		var self = this;
 		var $html=html;
 		if(!html.jquery){
 			$html = $(html);
 		}
 		var data={};
 		$html.find("[data-attribute-name]").each(function(i,elem){
-      var $elem = $(elem);
-      var value = undefined;
-      var attributeNameValue = $elem.attr("data-attribute-name");
-      if($elem.is("input[type=checkbox]")){
-				value = $elem.is(":checked");
-      }else if($elem.is("select")){
-	      value = $elem.val();
-      }else if( $elem.is("input") || $elem.is("textarea") ){
-	      value = $elem.val();
-			}else{
-	      value = $elem.html(); 
-      }
-      value = Helper.trim(value);
-      if(value == "true"){
-      	value = true;
-      }else if(value == "false"){
-      	value = false;
-      }else if(/^\[.*\]$/.test(value)){
-      	value = JSON.parse(value);
-      }
-      data[attributeNameValue] = value;
-
+			self.mergeAttributeValue(data,elem);
     });
 		return data;
 	},
@@ -79,6 +109,9 @@ Helper={
 		return Math.round(amount*100)/100;
 	},
 	amount: function(amount){
+		if(typeof amount == "string"){
+			amount = this.parseFloat(amount);
+		}
 		return amount.toFixed(2);
 	},
 	parseFloat:function(amount){
@@ -103,5 +136,48 @@ Helper={
 	guid: function() {
 	  return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
 	         this.s4() + '-' + this.s4() + this.s4() + this.s4();
-	}
+	},
+
+	diffArray: function(tab1,tab2,key){
+    var p1=0;
+    var p2=0;
+    var finished = false;
+    if(tab1[p1] ==undefined && tab2[p2] ==undefined){
+        finished = true;
+    }
+
+    while(!finished){
+      var t1=tab1[p1];
+      var t2=tab2[p2];
+      if(_.isEqual(t1,t2)){
+        t1.change="same";
+        p1+=1;
+        p2+=1;
+      }else if(t1 && t2 && t1[key]==t2[key]){
+        tab1[p1] = t2;        
+        t2.change="updated";
+        p1+=1;
+        p2+=1
+      }else if(t1 && t2 && t1[key] > t2[key]){
+        // La tache qui est dans t1 est connu
+        t1.change="deleted"
+        p1+=1;
+      }else if((t1 && t2 && t1[key] < t2[key]) || (!t1 && t2)){
+        tab1.splice(p1, 0, t2);
+        t2.change="added"
+        p1+=1;
+        p2+=1;
+      }else if(tab1[p1] !== undefined && tab2[p2] == undefined){
+        t1.change="deleted"
+        p1+=1;
+      }
+      if(tab1[p1] ==undefined && tab2[p2] ==undefined){
+        finished = true;
+      }
+    }
+    return tab1;
+  },
+
+
+
 }

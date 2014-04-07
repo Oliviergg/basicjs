@@ -190,24 +190,10 @@ var Router=Class.extend({
 			var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");
 			self.pushControllerHistory(new DefaultController({el:viewId}));
 		}
-		if($.cookies.get("just_signed")){
-			$.cookies.set("just_signed",false);
-			$(".navbar").show();
-			$( ".navbar" ).animate({
-		    top: "+=70"
-		    // height: "toggle"
-	  	}, 1000, function() {
-	    // Animation complete.
-	  	});
-		}else{
-			if(self.refreshMenu){
-				$(window).scrollTop(0);
-				self.refreshMenu();				
-			}
-			$(".navbar").offset({top:"70"})
-			$(".navbar").show();
-		}
 
+		if(this.onStart!==undefined){
+			this.onStart();
+		}
 		// $(".navbar").show();
 		console.log("router started");
 		// this.mapKey();
