@@ -105,6 +105,19 @@ var Router=Class.extend({
 	  self.popupTechnicalError = new PopupTechnicalError({el:"#popup_ajax_error_show"})
 
 
+	  if($("#popup_result").length > 0 && typeof ResultPopup !== "undefined" && ResultPopup !== undefined ){
+	  	self.popupResult = new ResultPopup({el:$("#popup_result")});
+	  }else{
+	  	self.popupResult={
+	  		show: function(){
+	  			console.log("no popup_result found");
+	  		},
+	  		hide: function(){
+	  			console.log("no popup_result found");
+	  		}
+	  	}
+	  }
+
 	  self.refreshMenu = function(){};
 
 
@@ -198,6 +211,7 @@ var Router=Class.extend({
 		console.log("router started");
 		// this.mapKey();
 	},
+	
 	navigate:function(pathname){
 		var self=this;
 		console.log("navigate ",pathname);
@@ -211,6 +225,7 @@ var Router=Class.extend({
 		this.pushState({}, "", pathname);
 		this.loadAndInitialize(pathname);
 	},
+
 	pushNavigate:function(pathname){
 		var $currentLevel = $("#history-level li.current");
 		var level = parseInt($currentLevel.attr("data-history-level"));
@@ -225,6 +240,7 @@ var Router=Class.extend({
 
 		this.loadAndInitialize(pathname);
 	},
+
 	loadAndInitialize: function(url){
 		var self=this;
 		var pathname = URI(url).pathname();
@@ -252,8 +268,10 @@ var Router=Class.extend({
 			self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
 			channel("View").broadcast({event:"LoadedAndInitialized"});
 			channel("View:LoadAndInitialize").broadcast({finished:true});
+			self.popupResult.hide();
 		})
 	},
+
 	refreshCurrentView: function(data){
 		var self=this;
 		var url = this.currentUrl();
