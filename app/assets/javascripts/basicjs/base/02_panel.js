@@ -86,9 +86,9 @@ var Panel=View.extend({
     this.$("[data-attribute-name]").each(function(i,elem){
       var $elem =$(elem);
       if($elem.attr("type")=="checkbox"){
-        data[$elem.data("attributeName")] = $elem.is(":checked");
+        data[$elem.attr("data-attribute-name")] = $elem.is(":checked");
       }else{
-        data[$elem.data("attributeName")] = $elem.val();
+        data[$elem.attr("data-attribute-name")] = $elem.val();
       }
     })
     this.valuesChangedCallback.call(this,data);
