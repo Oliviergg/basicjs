@@ -49,6 +49,35 @@ Helper={
 
 	},
 
+	objectToDataModel: function(object,modelName,html){
+		var self=this;
+		var $html=html;
+		if(!html.jquery){
+			$html = $(html);
+		}
+
+		if(object.attributes){
+			object = object.attributes;
+		}
+		_.each(_.pairs(object),function(pair){
+			var attr= pair[0];
+			var value= pair[1];
+			if(value==null){
+				value="";
+			}
+			var $elem = $html.find("[data-model-name='"+modelName+"'][data-attribute-name='"+attr+"']");
+			if($elem.is("input")){
+				$elem.val(value);
+			}else if($elem.is("select")){
+        $elem.select2().select2('val',value);
+			}else{
+				$elem.text(value);
+			}
+		})
+
+	},
+
+
 	dataAttributeToObject: function(html){
 		var self = this;
 		var $html=html;
@@ -61,6 +90,7 @@ Helper={
     });
 		return data;
 	},
+
 	objectToDataAttribute: function(object,html){
 		var $html=html;
 		if(!html.jquery){
@@ -115,7 +145,7 @@ Helper={
 		return amount.toFixed(2);
 	},
 	parseFloat:function(amount){
-		if(amount){
+		if(amount && amount !== ""){
 			return parseFloat(amount)
 		}else{
 			return 0.0;
@@ -178,6 +208,55 @@ Helper={
     return tab1;
   },
 
+  attributeVatProperties:function(attribute){
+  	var properties = {attribute:attribute};
+   	if(attribute == "price_inc_vat"){
+   		properties.is_inc_vat = true;
+   		properties.attribute_inc_vat = attribute;
+   		properties.attribute_exc_vat = "price_exc_vat";
+	  }else if(attribute == "price_inc_discount_inc_vat"){
+   		properties.is_inc_vat = true;
+   		properties.attribute_inc_vat = attribute;
+   		properties.attribute_exc_vat = "price_inc_discount_exc_vat";
+	  }else if(attribute == "price_inc_discount_exc_vat"){
+   		properties.is_inc_vat = false;
+   		properties.attribute_inc_vat = "price_inc_discount_inc_vat";
+   		properties.attribute_exc_vat = attribute;
+	  }else if(attribute == "price_exc_vat"){
+   		properties.is_inc_vat = false;
+   		properties.attribute_inc_vat = "price_inc_vat";
+   		properties.attribute_exc_vat = attribute;
+   	}else{
+	    if((result = attribute.match(/(.*)_inc_vat_(.*)/)) != null){
+	      properties.is_inc_vat = true;
+	      properties.attribute_inc_vat = attribute;
+	      properties.attribute_exc_vat = [result[1],result[2]].join("_");
+	    }else{
+	      properties.is_inc_vat = false;
+	      var l = attribute.lastIndexOf("_");
+	      properties.attribute_inc_vat = [attribute.substr(0,l),"_inc_vat_",attribute.substr(l+1)].join("");;
+	      properties.attribute_exc_vat = attribute;
+	    }
+   	}
+   	return properties;
+  },
 
+  applyVatRate: function($elem,vatRate){
+  	var attribute = $elem.attr("data-attribute-name");
+    var amount_exc_vat, amount_inc_vat;
+    var $context = $elem.closest(".js-auto_vat");
+    var prop = Helper.attributeVatProperties(attribute);
 
+    if(prop.is_inc_vat){
+      amount_inc_vat = Helper.amount($context.find("[data-attribute-name="+prop.attribute_inc_vat+"]").val());
+      amount_exc_vat = Helper.round2(amount_inc_vat/(1+vatRate));    	
+      $context.find("[data-attribute-name="+prop.attribute_exc_vat+"]").val(amount_exc_vat);
+    }else{
+      amount_exc_vat = Helper.amount($context.find("[data-attribute-name="+prop.attribute_exc_vat+"]").val());
+      amount_inc_vat = Helper.round2(amount_exc_vat*(1+vatRate));
+      $context.find("[data-attribute-name="+prop.attribute_inc_vat+"]").val(amount_inc_vat);
+    }
+  }
 }
+
+
