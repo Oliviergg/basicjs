@@ -62,18 +62,17 @@ var Router=Class.extend({
 
 			var $levels = $("#history-level").find("li[data-history-level]");
 			$levels.each(function(i,level){
-					var $level = $(level);
-					var level =	parseInt($level.attr("data-history-level"));
-			    $(window).scrollTop(0);
-					if(history.state.level < level){
-						$level.remove();
-						self.popControllerHistory();
-					}else if(history.state.level == level){
-						$level.addClass("current");
-						self.currentController().show();
-					}
-			    router.refreshMenu();
-
+				var $level = $(level);
+				var level =	parseInt($level.attr("data-history-level"));
+		    $(window).scrollTop(0);
+				if(history.state.level < level){
+					$level.remove();
+					self.popControllerHistory();
+				}else if(history.state.level == level){
+					$level.addClass("current");
+					self.currentController().show();
+				}
+		    router.refreshMenu();
 			})
 		};
 
