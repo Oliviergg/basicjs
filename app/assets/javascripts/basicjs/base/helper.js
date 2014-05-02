@@ -5,7 +5,9 @@ Helper={
 			$elem = $(elem);
 		}
     var value = undefined;
-    if($elem.is("input[type=checkbox]")){
+    if($elem.attr("original") !== undefined ){
+    	value = $elem.attr("original");
+    }else if($elem.is("input[type=checkbox]")){
 			value = $elem.is(":checked");
     }else if($elem.data("select2")){
     	value = $elem.select2("val");
@@ -256,6 +258,23 @@ Helper={
       amount_inc_vat = Helper.round2(amount_exc_vat*(1+vatRate));
       $context.find("[data-attribute-name="+prop.attribute_inc_vat+"]").val(amount_inc_vat);
     }
+  },
+
+
+  uiSpinEdit: function($el){
+
+    $el.find('.js-spin-duration').spinedit({
+      minimum: 12,
+      maximum: 72,
+      step: 3
+    });
+
+    $el.find('.js-spin-mileage').spinedit({
+      minimum: 20000,
+      maximum: 200000,
+      step: 5000
+    });
+
   }
 }
 
