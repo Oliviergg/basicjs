@@ -15,7 +15,7 @@ Model=Class.extend({
   },
   set:function(key,value){
     this.attributes[key]=value;
-    this.attrChanged(key);
+    this.attrChanged(key,value);
     return value;
   },
   get:function(key){
@@ -24,7 +24,9 @@ Model=Class.extend({
   attribute_names:function(){
     return _(this.attributes).keys();
   },
-  attrChanged:function(key){
+  attrChanged:function(key,value){
+    // this.notify(this.modelName+":updated",this);
+    // this.notify(this.modelName+":"+key+":updated",value);
   },
   validationWrapper:function(){
     this.validate();
@@ -38,6 +40,7 @@ Model=Class.extend({
   },
   notify:function(event,payload){
     if(!this.canNotify){return};
+    // console.log(event,payload);
     channel(this._channelName).broadcast({event: event,payload: payload});
   },
   notifyOn:function(){

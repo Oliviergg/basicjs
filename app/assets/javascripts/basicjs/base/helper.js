@@ -5,7 +5,7 @@ Helper={
 			$elem = $(elem);
 		}
     var value = undefined;
-    if($elem.attr("original") !== undefined ){
+    if($elem.attr("original") !== undefined && $elem.attr("original") !== "" ){
     	value = $elem.attr("original");
     }else if($elem.is("input[type=checkbox]")){
 			value = $elem.is(":checked");
