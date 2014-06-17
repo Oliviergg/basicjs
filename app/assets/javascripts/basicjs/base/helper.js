@@ -68,10 +68,12 @@ Helper={
 				value="";
 			}
 			var $elem = $html.find("[data-model-name='"+modelName+"'][data-attribute-name='"+attr+"']");
-			if($elem.is("input")){
-				$elem.val(value);
+			if($elem.is("input[type=checkbox]")){
+        $elem.prop("checked",value)
 			}else if($elem.is("select")){
         $elem.select2().select2('val',value);
+			}else if($elem.is("input")){
+				$elem.val(value);
 			}else{
 				$elem.text(value);
 			}
