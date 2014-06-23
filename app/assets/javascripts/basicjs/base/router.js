@@ -78,6 +78,7 @@ var Router=Class.extend({
 
 	  $("body").on("click", "a[data-ajax-navigation]", function(e){
 	    var $currentTarget = $(e.currentTarget);
+	    if($currentTarget.hasClass("disabled")) return false;
 	    var href=$currentTarget.attr("href");
 	    self.pushNavigate(href);
 	    var $ddm = $currentTarget.closest(".dropdown");

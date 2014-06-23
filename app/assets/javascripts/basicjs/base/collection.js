@@ -3,7 +3,7 @@
   SlaList = Collection.extend({
     url:"/service_level_agreements",
     modelName:"sla",
-    model:function(){return ServiceLevelAgreement},
+    model:function(){return ServiceLevelAgreement}
   })
   slas = new SlaList({sla_number:"A0010"});
   
