@@ -103,17 +103,22 @@ var Collection = Class.extend({
       this.request.handledError = true;
       this.request.abort();
     }
-    var dataType = "html";
-    if(opts.dataType=="json"){
-      dataType="json"
-    }
 
+    // Sometime browser cache json or html request and return cache content without controlling datatype
+    // WorkAround : (Rails Only) without disabling cache.
+
+    var dataType = "html";
+    var url = this.url;
+    if(opts.dataType == "json"){
+      dataType = "json";
+    }
+    url += "." + dataType;
 
     this.request = $.ajax({
-      url:this.url,
-      dataType:dataType,
-      type:"get",
-      data:data,
+      url: url,
+      dataType: dataType,
+      type: "get",
+      data: data,
       success:function(data){
         self.request=null;
         if(dataType == "html"){
