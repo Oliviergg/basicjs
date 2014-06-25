@@ -112,8 +112,10 @@ Helper={
 			var $elem = $html.find("[data-attribute-name='"+attr+"']");
 			if($elem.is("input")){
 				$elem.val(value);
+			}else if($elem.data("select2")){		
+				$elem.select2().select2('val',value);				
 			}else if($elem.is("select")){
-        $elem.select2().select2('val',value);
+        $elem.val(value);
 			}else{
 				$elem.text(value);
 			}
