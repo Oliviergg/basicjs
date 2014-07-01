@@ -105,8 +105,8 @@ var Router=Class.extend({
 	  self.popupTechnicalError = new PopupTechnicalError({el:"#popup_ajax_error_show"})
 
 
-	  if($("#popup_result").length > 0 && typeof ResultPopup !== "undefined" && ResultPopup !== undefined ){
-	  	self.popupResult = new ResultPopup({el:$("#popup_result")});
+	  if($("#popup_result").length > 0 && typeof PopupResult !== "undefined" && PopupResult !== undefined ){
+	  	self.popupResult = new PopupResult({el:$("#popup_result")});
 	  }else{
 	  	self.popupResult={
 	  		show: function(){
