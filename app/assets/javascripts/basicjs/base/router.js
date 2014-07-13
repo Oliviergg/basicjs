@@ -193,6 +193,7 @@ var Router=Class.extend({
 			return pathname.match(pathnameRouter.route) !== null
 		});
 
+		this.defaultView = this.defaultView || "";
 		this.resetControllerHistory();
 		if(pathnameRouter !== undefined ){
 			var parameters  =this.extractParameters(pathnameRouter.route,pathname);
@@ -218,7 +219,7 @@ var Router=Class.extend({
 
 		self.currentController().hide();
 		$("#history-level li").remove();
-		$("#history-level").html("<li data-history-level=0 class='current'><div class=view></div></li>");
+		$("#history-level").html("<li data-history-level=0 class='current'><div class=view><div id='default_view'>"+self.defaultView+"</div></div></li>");
 		this.resetControllerHistory();
 
 		// this.currentController.hide();
@@ -232,7 +233,7 @@ var Router=Class.extend({
 		var nextLevel = level + 1;
 
 		$currentLevel.removeClass("current");
-		$("#history-level").prepend("<li data-history-level=" + nextLevel + " class='current'><div class=view></div></li>"); 
+		$("#history-level").prepend("<li data-history-level=" + nextLevel + " class='current'><div class=view><div id='default_view'>"+this.defaultView+"</div></div></li>");
 		
 		this.replaceState({level:level}, "", window.location.href);
 		this.pushState({level: nextLevel},"",pathname);
