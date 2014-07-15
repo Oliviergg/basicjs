@@ -42,38 +42,40 @@ var Router=Class.extend({
 	init:function(){
 		var self=this;
 		routes=[];
-		window.onpopstate= function(event){
+		window.onstatechange= function(event){
+			var currentState = History.getState();
 			var $currentLevel = $("#history-level li.current");
-			var currentLevel = parseInt($currentLevel.attr("data-history-level"));
+			var level = parseInt($currentLevel.attr("data-history-level"));
+			
+			if(currentState.data.level == undefined){
+				var nextLevel = level + 1;
+				$currentLevel.removeClass("current");
+				$("#history-level").prepend("<li data-history-level=" + nextLevel + " class='current'><div class=view><div id='default_view'>"+self.defaultView+"</div></div></li>");
+				self.currentController().hide();
+				History.replaceState({level:nextLevel}, currentState.title, currentState.url);
 
-			if(history.state == null  || history.state.level == undefined || history.state.level > currentLevel){
-				// console.log("popstate",event);
-				// self.hideControllerTimeout = setTimeout(function(){self.currentController().hide()},200);
-				// self.loadAndInitialize()				
-				self.navigate(window.location.href)
-			  $(window).scrollTop(0);
-				router.refreshMenu();			  
-				return;				
+			}else if (level == 0 && currentState.data.level == 0){
+				self.loadAndInitialize(currentState.url);
+				
+
+			}else if (currentState.data.level == level){
+				self.loadAndInitialize(currentState.url);			
+				
+			}else if (currentState.data.level < level){
+				$("#history-level li[data-history-level]").each(function(index,elem){
+					var $level = $(elem);
+					if($level.attr("data-history-level") > currentState.data.level){
+						$level.remove();
+						self.popControllerHistory();
+					};
+					if($level.attr("data-history-level") == currentState.data.level){
+						$level.addClass("current");
+					};
+				})
+				self.currentController().show();
+			}else if (currentState.data.level > level){
+				History.replaceState({level:undefined}, currentState.title, currentState.url);				
 			}
-
-			if(currentLevel == history.state.level ){
-				return;
-			}
-
-			var $levels = $("#history-level").find("li[data-history-level]");
-			$levels.each(function(i,level){
-				var $level = $(level);
-				var level =	parseInt($level.attr("data-history-level"));
-		    $(window).scrollTop(0);
-				if(history.state.level < level){
-					$level.remove();
-					self.popControllerHistory();
-				}else if(history.state.level == level){
-					$level.addClass("current");
-					self.currentController().show();
-				}
-		    router.refreshMenu();
-			})
 		};
 
 	  $("body").on("click", "a[data-ajax-navigation]", function(e){
@@ -127,83 +129,16 @@ var Router=Class.extend({
 	route:function(route,callback){
 		routes.push({route:this.routeToRegExp(route),callback:callback});
 	},
-	bindKey: function(){
-		var self=this;
-		$(Config.KEY_DOM_HANDLER).bind(Config.PREVIOUS_PAGE_KEY,function(e){
-			console.log("PREVIOUS_PAGE_KEY")
-			if(self.currentController().previousPage){
-				self.currentController().previousPage(e)
-			}
-      return(false);
-    })
-    $(Config.KEY_DOM_HANDLER).bind(Config.NEXT_PAGE_KEY,function(e){
-			console.log("NEXT_PAGE_KEY")
-			if(self.currentController().nextPage){
-				self.currentController().nextPage(e)
-			}
-      return(false);
-    })
-    
-    $(Config.KEY_DOM_HANDLER).bind(Config.PREVIOUS_LINE_KEY,function(e){
-			console.log("PREVIOUS_LINE_KEY")
-			if(self.currentController().previousLine){
-				self.currentController().previousLine(e)
-			}
-      return(false);
-    })
-    
-    $(Config.KEY_DOM_HANDLER).on(Config.NEXT_LINE_KEY,function(e){
-			console.log("NEXT_LINE_KEY")
-			if(self.currentController().nextLine){
-				self.currentController().nextLine(e)
-			}
-      return(false);
-    })
-
-    $(Config.KEY_DOM_HANDLER).bind(Config.SEARCH_KEY,function(e){
-			console.log("SEARCH_KEY")
-			if(self.currentController().search){
-				self.currentController().search(e)
-			}
-      return(false);
-    })
-    $(Config.KEY_DOM_HANDLER).bind(Config.SELECT_LINE_KEY,function(e){
-			console.log("SELECT_LINE_KEY")
-			if(self.currentController().selectLine){
-				self.currentController().selectLine(e)
-			}
-      return(false);
-    })
-
-	},
-	unbindKey: function(){
-		$(Config.KEY_DOM_HANDLER).unbind(Config.PREVIOUS_PAGE_KEY);
-    $(Config.KEY_DOM_HANDLER).unbind(Config.NEXT_PAGE_KEY);
-    $(Config.KEY_DOM_HANDLER).unbind(Config.PREVIOUS_LINE_KEY);
-    $(Config.KEY_DOM_HANDLER).unbind(Config.NEXT_LINE_KEY);
-    $(Config.KEY_DOM_HANDLER).unbind(Config.SEARCH_KEY);
-    $(Config.KEY_DOM_HANDLER).unbind(Config.SELECT_LINE_KEY);
-	},
 
 	start:function(){
 		var self=this;
 		var url = window.location.pathname;
-		var pathname = URI(url).pathname();
-		var pathnameRouter=_.find(routes,function(pathnameRouter){
-			return pathname.match(pathnameRouter.route) !== null
-		});
 
 		this.defaultView = this.defaultView || "";
 		this.resetControllerHistory();
-		if(pathnameRouter !== undefined ){
-			var parameters  =this.extractParameters(pathnameRouter.route,pathname);
-			$(document).ready(function(){
-				self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
-			})
-		}else{
-			var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");
-			self.pushControllerHistory(new DefaultController({el:viewId}));
-		}
+
+		History.pushState({level:0},"",url);
+
 
 		if(this.onStart!==undefined){
 			this.onStart();
@@ -213,33 +148,8 @@ var Router=Class.extend({
 		// this.mapKey();
 	},
 	
-	navigate:function(pathname){
-		var self=this;
-		console.log("navigate ",pathname);
-
-		self.currentController().hide();
-		$("#history-level li").remove();
-		$("#history-level").html("<li data-history-level=0 class='current'><div class=view><div id='default_view'>"+self.defaultView+"</div></div></li>");
-		this.resetControllerHistory();
-
-		// this.currentController.hide();
-		this.pushState({}, "", pathname);
-		this.loadAndInitialize(pathname);
-	},
-
 	pushNavigate:function(pathname){
-		var $currentLevel = $("#history-level li.current");
-		var level = parseInt($currentLevel.attr("data-history-level"));
-		var nextLevel = level + 1;
-
-		$currentLevel.removeClass("current");
-		$("#history-level").prepend("<li data-history-level=" + nextLevel + " class='current'><div class=view><div id='default_view'>"+this.defaultView+"</div></div></li>");
-		
-		this.replaceState({level:level}, "", window.location.href);
-		this.pushState({level: nextLevel},"",pathname);
-		this.currentController().hide();
-
-		this.loadAndInitialize(pathname);
+		History.pushState(null,null,pathname);
 	},
 
 	loadAndInitialize: function(url){
@@ -250,6 +160,7 @@ var Router=Class.extend({
 			return pathname.match(router.route) !== null
 		});
 		var parameters;
+		console.time(url)
 		$.get(url,function(data){
 			var $view = $(data).find(".view");
 			$("#history-level li.current .view").html($view.html());
@@ -266,57 +177,22 @@ var Router=Class.extend({
 			}else{
 				parameters  = self.extractParameters(pathnameRouter.route,pathname);
 			};
-			self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
 			channel("View").broadcast({event:"LoadedAndInitialized"});
 			channel("View:LoadAndInitialize").broadcast({finished:true});
 			self.popupResult.hide();
+			console.timeEnd(url);
+			self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
 		})
 	},
 
-	refreshCurrentView: function(data){
-		var self=this;
-		var url = this.currentUrl();
-		var pathname = URI(url).pathname();
-
-		var router=_.find(routes,function(router){
-			return pathname.match(router.route) !== null
-		});
-		var parameters;
-		var $view = $(data).find(".view");
-		$("#history-level li.current .view").html($view.html());
-
-		if(router === undefined){
-			var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");			
-			router= { 
-				route:pathname,
-				callback: function(){
-					return new DefaultController({el:viewId});
-				}
-			}
-			parameters  = [];
-		}else{
-			parameters  = self.extractParameters(router.route,pathname);
-		};
-		self.popControllerHistory();
-		self.pushControllerHistory(router.callback.apply(window,parameters));
-	},	
 	reloadPage: function(){
 		this.loadAndInitialize(window.location.href,true);
 	},
-	pushState: function(state,title,url){
-		console.log("pushState ",state,url);
-		window.history.pushState(state,title,url);
-	},
-	replaceState: function(state,title,url){
-		console.log("replaceState ",state,url);
-		window.history.replaceState(state,title,url);
-	},
-	getState: function(){
-		return window.history.state;
-	},
+
 	reload: function(){
 		window.location.href="/";
 	},	
+	
 	openInNewTab:function(url){
 		if(url.substring(0,2)=="\\\\" || url.substring(0,2)=="//"){
 			url = "file:"+url;
@@ -325,8 +201,16 @@ var Router=Class.extend({
 	},
 	currentUrl: function(){
 		var url = window.location.href;
-		return url.replace(/\/#\//,"/");
+		var res = url.match(/(.*)#(.*)$/);
+		if(res == undefined){
+			return url
+		}else{
+			url = History.getRootUrl() + res[2];
+			return url;	
+		}
+		
 	}
+
 })
 
 
