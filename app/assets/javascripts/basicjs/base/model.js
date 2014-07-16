@@ -32,7 +32,7 @@ Model=Class.extend({
     this.validate();
   },
   onChannelReceived:function(args){
-    console.log("received on ",this._channelName,args);
+    // console.log("received on ",this._channelName,args);
   },
   channelName: function(cn){
     this._channelName = cn;

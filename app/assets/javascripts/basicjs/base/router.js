@@ -97,7 +97,6 @@ var Router=Class.extend({
 
 
 	  window.onerror = function(message, url, lineNumber) {  
-	    console.log(message,url,lineNumber);
 	    alert(message+"\n"+url+"\n"+lineNumber);
 	    return false;
 	  };  
@@ -112,10 +111,10 @@ var Router=Class.extend({
 	  }else{
 	  	self.popupResult={
 	  		show: function(){
-	  			console.log("no popup_result found");
+	  			console.log("Router - no popup_result found");
 	  		},
 	  		hide: function(){
-	  			console.log("no popup_result found");
+	  			console.log("Router - no popup_result found");
 	  		}
 	  	}
 	  }

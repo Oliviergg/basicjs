@@ -26,12 +26,7 @@ var Panel=View.extend({
   },
 
   finder: function(filter){
-    console.log("finder");
     var cl=new this.collection(filter);
-    // this.finder=function(filter){
-    //   cl.setFilter(filter);
-    //   return cl;
-    // };
     return cl;
   },
 
