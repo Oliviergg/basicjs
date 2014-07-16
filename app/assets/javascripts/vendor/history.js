@@ -3290,8 +3290,3 @@ if (typeof JSON !== 'object') {
     }
 
 })(window);
-
-History.emulated = {
-    pushState: true,
-    hashChange: true
-    };
