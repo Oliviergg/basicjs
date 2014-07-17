@@ -41,8 +41,8 @@ var Router=Class.extend({
 
 	init:function(){
 		var self=this;
-		routes=[];
-		window.onstatechange= function(event){
+		this.routes=[];
+		window.onstatechange = function(event){
 			var currentState = History.getState();
 			var $currentLevel = $("#history-level li.current");
 			var level = parseInt($currentLevel.attr("data-history-level"));
@@ -126,7 +126,7 @@ var Router=Class.extend({
 		this.controllerHistory=[];
 	},
 	route:function(route,callback){
-		routes.push({route:this.routeToRegExp(route),callback:callback});
+		this.routes.push({route:this.routeToRegExp(route),callback:callback});
 	},
 
 	start:function(){
@@ -137,6 +137,7 @@ var Router=Class.extend({
 		this.resetControllerHistory();
 
 		History.pushState({level:0},"",url);
+		this.loadAndInitialize(url);
 
 
 		if(this.onStart!==undefined){
@@ -155,7 +156,7 @@ var Router=Class.extend({
 		var self=this;
 		var pathname = URI(url).pathname();
 
-		var pathnameRouter=_.find(routes,function(router){
+		var pathnameRouter=_.find(self.routes,function(router){
 			return pathname.match(router.route) !== null
 		});
 		var parameters;
@@ -182,6 +183,14 @@ var Router=Class.extend({
 			console.timeEnd(url);
 			self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
 		})
+	},
+
+	back: function(){
+		if(this.controllerHistory.length > 1){
+			History.back();
+		}else{
+			this.loadAndInitialize("/");
+		}
 	},
 
 	reloadPage: function(){
