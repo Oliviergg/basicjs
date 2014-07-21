@@ -4,4 +4,5 @@ $( document ).ajaxError(function(event, jqxhr, settings, exception) {
     if (jqxhr.statusText === "abort") return;
     if (jqxhr.responseText === "") return;
     router.popupTechnicalError.show(jqxhr.responseText);
+    return false
 });
