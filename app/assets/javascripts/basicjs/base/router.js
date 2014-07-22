@@ -131,7 +131,7 @@ var Router=Class.extend({
 
 	start:function(){
 		var self=this;
-		var url = window.location.pathname;
+		var url = window.location.href;
 
 		this.defaultView = this.defaultView || "";
 		this.resetControllerHistory();
