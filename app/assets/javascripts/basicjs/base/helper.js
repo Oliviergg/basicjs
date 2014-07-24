@@ -51,6 +51,26 @@ Helper={
 
 	},
 
+	setHtmlElementValue: function($elem,value){
+		if(value==null){
+			value="";
+		}
+		if($elem.is("input[type=checkbox]")){
+      $elem.prop("checked",value)
+		}else if($elem.is("select")){
+			if(value === true){
+				value = "true"
+			}else if(value === false){
+				value = "false"
+			}
+      $elem.select2().select2('val',value);
+		}else if($elem.is("input")){
+			$elem.val(value);
+		}else{
+			$elem.text(value);
+		}
+	},
+
 	objectToDataModel: function(object,modelName,html){
 		var self=this;
 		var $html=html;
@@ -64,19 +84,8 @@ Helper={
 		_.each(_.pairs(object),function(pair){
 			var attr= pair[0];
 			var value= pair[1];
-			if(value==null){
-				value="";
-			}
 			var $elem = $html.find("[data-model-name='"+modelName+"'][data-attribute-name='"+attr+"']");
-			if($elem.is("input[type=checkbox]")){
-        $elem.prop("checked",value)
-			}else if($elem.is("select")){
-        $elem.select2().select2('val',value);
-			}else if($elem.is("input")){
-				$elem.val(value);
-			}else{
-				$elem.text(value);
-			}
+			Helper.setHtmlElementValue($elem,value);
 		})
 
 	},
@@ -106,21 +115,11 @@ Helper={
 		_.each(_.pairs(object),function(pair){
 			var attr= pair[0];
 			var value= pair[1];
-			if(value==null){
-				value="";
-			}
 			var $elem = $html.find("[data-attribute-name='"+attr+"']");
-			if($elem.is("input")){
-				$elem.val(value);
-			}else if($elem.data("select2")){		
-				$elem.select2().select2('val',value);				
-			}else if($elem.is("select")){
-        $elem.val(value);
-			}else{
-				$elem.text(value);
-			}
+			Helper.setHtmlElementValue($elem,value);
 		})
 	},
+	
 	clearDataAttribute: function(html){
 		var $html=html;
 		if(!html.jquery){
