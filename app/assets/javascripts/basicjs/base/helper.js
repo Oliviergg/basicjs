@@ -72,6 +72,7 @@ Helper={
 	},
 
 	objectToDataModel: function(object,modelName,html){
+		if (object === null || object === undefined) return;
 		var self=this;
 		var $html=html;
 		if(!html.jquery){
@@ -119,7 +120,7 @@ Helper={
 			Helper.setHtmlElementValue($elem,value);
 		})
 	},
-	
+
 	clearDataAttribute: function(html){
 		var $html=html;
 		if(!html.jquery){
