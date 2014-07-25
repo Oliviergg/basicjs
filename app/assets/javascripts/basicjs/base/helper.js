@@ -52,22 +52,28 @@ Helper={
 	},
 
 	setHtmlElementValue: function($elem,value){
-		if(value==null){
-			value="";
+		var _value = value;
+		if(_value==null){
+			_value="";
 		}
 		if($elem.is("input[type=checkbox]")){
-      $elem.prop("checked",value)
+			if(_value == ""){_value=false};
+      $elem.prop("checked",_value)
 		}else if($elem.is("select")){
-			if(value === true){
-				value = "true"
-			}else if(value === false){
-				value = "false"
+			if(_value === true){
+				_value = "true"
+			}else if(_value === false){
+				_value = "false"
 			}
-      $elem.select2().select2('val',value);
+      $elem.select2().select2('val',_value);
 		}else if($elem.is("input")){
-			$elem.val(value);
+			if($elem.data("select2")){
+				$elem.select2("val",_value);
+			}else{
+				$elem.val(_value);
+			}
 		}else{
-			$elem.text(value);
+			$elem.text(_value);
 		}
 	},
 
@@ -82,6 +88,7 @@ Helper={
 		if(object.attributes){
 			object = object.attributes;
 		}
+
 		_.each(_.pairs(object),function(pair){
 			var attr= pair[0];
 			var value= pair[1];
