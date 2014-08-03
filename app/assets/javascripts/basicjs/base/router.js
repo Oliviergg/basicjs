@@ -36,7 +36,7 @@ var Router=Class.extend({
   	return this.controllerHistory.pop();
   },
   resetControllerHistory: function(){
-  	return this.controllerHistory.pop();
+  	this.controllerHistory = [];
   },
 
 	init:function(){
@@ -48,10 +48,13 @@ var Router=Class.extend({
 			var level = parseInt($currentLevel.attr("data-history-level"));
 
 			if(currentState.data.level == undefined){
+				// New page
 				var nextLevel = level + 1;
 				$currentLevel.removeClass("current");
 				$("#history-level").prepend("<li data-history-level=" + nextLevel + " class='current'><div class=view><div id='default_view'>"+self.defaultView+"</div></div></li>");
-				self.currentController().hide();
+				if(self.currentController()){
+					self.currentController().hide();
+				}
 				History.replaceState({level:nextLevel}, currentState.title, currentState.url);
 
 			}else if (level == 0 && currentState.data.level == 0){
@@ -73,6 +76,7 @@ var Router=Class.extend({
 					};
 				})
 				self.currentController().show();
+
 			}else if (currentState.data.level > level){
 				History.replaceState({level:undefined}, currentState.title, currentState.url);
 			}
@@ -137,7 +141,9 @@ var Router=Class.extend({
 		var url = window.location.href;
 
 		this.defaultView = this.defaultView || "";
+		this.alertOn = this.alertOn || false;
 		this.resetControllerHistory();
+
 
 		History.pushState({level:0},"",url);
 		this.loadAndInitialize(url);
