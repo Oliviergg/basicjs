@@ -226,6 +226,12 @@ var Router=Class.extend({
 			return url;
 		}
 
+	},
+	ajaxError: function(){
+		if (settings.handledError) return;
+		if (jqxhr.statusText === "abort") return;
+		if (jqxhr.responseText === "") return;
+		router.popupTechnicalError.show(jqxhr.responseText);
 	}
 
 })
