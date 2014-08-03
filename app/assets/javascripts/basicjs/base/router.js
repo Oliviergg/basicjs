@@ -1,4 +1,4 @@
-// Router 
+// Router
 // THe purpose of the router is to apply the javascript controller corresponding to a specific url.
 // The browser load a page, the router is started and choose the controller corresponding to the given route.
 // cf application.js for the detail of routes.
@@ -46,7 +46,7 @@ var Router=Class.extend({
 			var currentState = History.getState();
 			var $currentLevel = $("#history-level li.current");
 			var level = parseInt($currentLevel.attr("data-history-level"));
-			
+
 			if(currentState.data.level == undefined){
 				var nextLevel = level + 1;
 				$currentLevel.removeClass("current");
@@ -56,11 +56,11 @@ var Router=Class.extend({
 
 			}else if (level == 0 && currentState.data.level == 0){
 				self.loadAndInitialize(currentState.url);
-				
+
 
 			}else if (currentState.data.level == level){
-				self.loadAndInitialize(currentState.url);			
-				
+				self.loadAndInitialize(currentState.url);
+
 			}else if (currentState.data.level < level){
 				$("#history-level li[data-history-level]").each(function(index,elem){
 					var $level = $(elem);
@@ -74,8 +74,17 @@ var Router=Class.extend({
 				})
 				self.currentController().show();
 			}else if (currentState.data.level > level){
-				History.replaceState({level:undefined}, currentState.title, currentState.url);				
+				History.replaceState({level:undefined}, currentState.title, currentState.url);
 			}
+		};
+
+		window.onerror = function(message, url, lineNumber) {
+			if(router.alertOn == true ){
+				alert(message+"\n"+url+"\n"+lineNumber);
+			}else{
+				console.log(message+"\n"+url+"\n"+lineNumber);
+			}
+			return false;
 		};
 
 	  $("body").on("click", "a[data-ajax-navigation]", function(e){
@@ -94,12 +103,6 @@ var Router=Class.extend({
 	  $("body").on("click","a[data-newtab-navigation]",function(e){
 	    self.openInNewTab($(e.currentTarget).attr("href"));
 	  })
-
-
-	  window.onerror = function(message, url, lineNumber) {  
-	    alert(message+"\n"+url+"\n"+lineNumber);
-	    return false;
-	  };  
 
 	  self.defaultController = DefaultController;
 
@@ -147,7 +150,7 @@ var Router=Class.extend({
 		console.log("router started");
 		// this.mapKey();
 	},
-	
+
 	pushNavigate:function(pathname){
 		History.pushState(null,null,pathname);
 	},
@@ -166,8 +169,8 @@ var Router=Class.extend({
 			$("#history-level li.current .view").html($view.html());
 
 			if(pathnameRouter === undefined){
-				var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");			
-				pathnameRouter= { 
+				var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");
+				pathnameRouter= {
 					route:pathname,
 					callback: function(){
 						return new DefaultController({el:viewId});
@@ -199,8 +202,8 @@ var Router=Class.extend({
 
 	reload: function(){
 		window.location.href="/";
-	},	
-	
+	},
+
 	openInNewTab:function(url){
 		if(url.substring(0,2)=="\\\\" || url.substring(0,2)=="//"){
 			url = "file:"+url;
@@ -214,33 +217,9 @@ var Router=Class.extend({
 			return url
 		}else{
 			url = History.getRootUrl() + res[2];
-			return url;	
+			return url;
 		}
-		
+
 	}
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
