@@ -227,7 +227,7 @@ var Router=Class.extend({
 		}
 
 	},
-	ajaxError: function(){
+	ajaxError: function(event, jqxhr, settings, exception){
 		if (settings.handledError) return;
 		if (jqxhr.statusText === "abort") return;
 		if (jqxhr.responseText === "") return;
