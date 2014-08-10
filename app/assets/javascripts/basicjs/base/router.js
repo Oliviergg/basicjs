@@ -169,7 +169,8 @@ var Router=Class.extend({
 			return pathname.match(router.route) !== null
 		});
 		var parameters;
-		console.time(url)
+		channel("Router").broadcast({name:"LoadAndInitialize:Start",payload:{url:url,time:new Date().getTime()}});
+
 		$.get(url,function(data){
 			var $view = $(data).find(".view");
 			$("#history-level li.current .view").html($view.html());
@@ -186,10 +187,12 @@ var Router=Class.extend({
 			}else{
 				parameters  = self.extractParameters(pathnameRouter.route,pathname);
 			};
-			channel("View").broadcast({event:"LoadedAndInitialized"});
+			channel("View").broadcast({event:"LoadedAndInitialized",payload:{url:url}});
 			channel("View:LoadAndInitialize").broadcast({finished:true});
+			
+			channel("Router").broadcast({name:"LoadAndInitialize:Finished",payload:{url:url,time:new Date().getTime()}});
+
 			self.popupResult.hide();
-			console.timeEnd(url);
 			self.pushControllerHistory(pathnameRouter.callback.apply(window,parameters));
 		})
 	},
