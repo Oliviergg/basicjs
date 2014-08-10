@@ -7,6 +7,7 @@ var Router=Class.extend({
 	namedParam    : /(\(\?)?:\w+/g,
 	splatParam    : /\*\w+/g,
 	escapeRegExp  : /[\-{}\[\]+?.,\\\^$|#\s]/g,
+	firstControllerLoading: false,
   routeToRegExp: function(route) {
     route = route.replace(this.escapeRegExp, '\\$&')
                  .replace(this.optionalParam, '(?:$1)?')
@@ -58,8 +59,10 @@ var Router=Class.extend({
 				History.replaceState({level:nextLevel}, currentState.title, currentState.url);
 
 			}else if (level == 0 && currentState.data.level == 0){
-				self.loadAndInitialize(currentState.url);
-
+				if(!self.firstControllerLoading){
+					self.firstControllerLoading = true;
+					self.loadAndInitialize(currentState.url);
+				}
 
 			}else if (currentState.data.level == level){
 				self.loadAndInitialize(currentState.url);
@@ -146,7 +149,11 @@ var Router=Class.extend({
 
 
 		History.pushState({level:0},"",url);
-		this.loadAndInitialize(url);
+		if(!this.firstControllerLoading){
+			this.firstControllerLoading = true;
+			this.loadAndInitialize(url);
+		}
+
 
 
 		if(this.onStart!==undefined){
