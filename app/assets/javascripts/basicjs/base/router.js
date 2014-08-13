@@ -220,6 +220,34 @@ var Router=Class.extend({
 		window.location.href="/";
 	},
 
+	refreshCurrentView: function(data){
+		var self=this;
+		var url = this.currentUrl();
+		var pathname = URI(url).pathname();
+
+		var controller=_.find(self.routes,function(_controller){
+			return pathname.match(_controller.route) !== null
+		});
+		var parameters;
+		var $view = $(data).find(".view");
+		$("#history-level li.current .view").html($view.html());
+
+		if(controller === undefined){
+			var viewId = "#"+$("#history-level li.current .view").find("div").first().attr("id");			
+			controller= { 
+				route:pathname,
+				callback: function(){
+					return new DefaultController({el:viewId});
+				}
+			}
+			parameters  = [];
+		}else{
+			parameters  = self.extractParameters(controller.route,pathname);
+		};
+		self.popControllerHistory();
+		self.pushControllerHistory(controller.callback.apply(window,parameters));
+	},	
+
 	openInNewTab:function(url){
 		if(url.substring(0,2)=="\\\\" || url.substring(0,2)=="//"){
 			url = "file:"+url;
